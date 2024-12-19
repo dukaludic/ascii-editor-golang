@@ -12,12 +12,16 @@ import (
 var width int = 140
 var cellSide int = 10
 
-func openAndDecodeImage(path string) (image.Image, image.Rectangle, error) {
+type Dimensions struct {
+	width, height int
+}
+
+func openImageAndGetDimensions(path string) (image.Image, Dimensions, error) {
 	file, err := os.Open(path)
 
 	if err != nil {
 		fmt.Println("Error opening file:", err)
-		return nil, image.Rectangle{}, err
+		return nil, Dimensions{}, err
 	}
 	defer file.Close()
 
@@ -29,11 +33,16 @@ func openAndDecodeImage(path string) (image.Image, image.Rectangle, error) {
 
 	bounds := img.Bounds()
 
-	return img, bounds, err
+	width := bounds.Max.X - bounds.Min.X
+	height := bounds.Max.Y - bounds.Min.Y
+
+	Dimensions := Dimensions{width, height}
+
+	return img, Dimensions, err
 }
 
 func main() {
-	img, _, err := openAndDecodeImage("./image.jpg")
+	img, _, err := openImageAndGetDimensions("./image.jpg")
 
 	if err != nil {
 		panic(err)
